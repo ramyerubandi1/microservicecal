@@ -3,7 +3,7 @@ pipeline {
 
     environment {
         DOCKER_CREDENTIALS_ID = 'docker-hub-credentials' 
-        DOCKER_IMAGE = 'yerubandiram/microservicea'
+        DOCKER_IMAGE = 'yerubandiram/microservicecl'
         GITHUB_REPO = 'https://github.com/ramyerubandi1/microservicecal.git'
         GIT_BRANCH = 'main' 
     }
