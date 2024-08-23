@@ -2,7 +2,7 @@ pipeline {
     agent any
 
     environment {
-        DOCKER_IMAGE = 'microserviceb'
+        DOCKER_IMAGE = '024848485298.dkr.ecr.us-west-2.amazonaws.com/microserviceb'
         ECR_REPOSITORY = '024848485298.dkr.ecr.us-west-2.amazonaws.com/microserviceb'
         AWS_REGION = 'us-west-2'
         GITHUB_REPO = 'https://github.com/ramyerubandi1/microservicecal.git'
@@ -50,8 +50,8 @@ pipeline {
                     echo 'Pushing Docker image to ECR...'
                     def customImage = docker.image("${env.DOCKER_IMAGE}:latest")
                     sh "docker images"
-                    customImage.tag("${env.ECR_REPOSITORY}:latest")
-                    //customImage.push('latest')
+                   // customImage.tag("${env.ECR_REPOSITORY}:latest")
+                    customImage.push('latest')
                 }
             }
         }
