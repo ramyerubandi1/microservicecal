@@ -11,7 +11,7 @@ pipeline {
         stage('Checkout') {
             steps {
                 script {
-                    echo "Checking out repository from ${env.GITHUB_REPO} branch ${env.GIT_BRANCH}"
+                    echo "Checking out repository from ${https://github.com/ramyerubandi1/microservicecal.git} branch ${main}"
                     checkout([$class: 'GitSCM',
                         branches: [[name: "*/${env.GIT_BRANCH}"]],
                         userRemoteConfigs: [[url: "${env.GITHUB_REPO}"]]
