@@ -1,5 +1,5 @@
 pipeline {
-    agent { seh-sit
+    agent { any
             
         }
     
