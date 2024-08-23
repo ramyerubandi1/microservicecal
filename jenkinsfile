@@ -2,7 +2,7 @@ pipeline {
     agent { seh-sit
             
         }
-    }
+    
     environment {
         ECR_REPOSITORY = 'yerubandiram'
         IMAGE_TAG = 'latest'
