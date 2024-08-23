@@ -1,50 +1,67 @@
 pipeline {
-    agent { any
-            
-        }
-    
+    agent any
+
     environment {
-        ECR_REPOSITORY = 'yerubandiram'
-        IMAGE_TAG = 'latest'
-        AWS_REGION = 'us-west-2'
-        ECR_URI = "024848485298.dkr.ecr.${us-west-2}.amazonaws.com/${yerubandiram}"
+        DOCKER_IMAGE = 'yerubandiram/microserviceb'
+        ECR_REPOSITORY = '024848485298.dkr.ecr.us-west-2.amazonaws.com/yerubandiram'  // Update this to your ECR repository URL
+        AWS_REGION = 'us-west-2'  // Update this to your AWS region
     }
+
     stages {
-        stage('Checkout Code') {
+        stage('Checkout') {
             steps {
-                git branch: 'main', url: 'https://github.com/ramyerubandi1/microservicecal.git'
+                script {
+                    echo "Checking out repository from ${env.GITHUB_REPO} branch ${env.GIT_BRANCH}"
+                    checkout([$class: 'GitSCM',
+                        branches: [[name: "*/${env.GIT_BRANCH}"]],
+                        userRemoteConfigs: [[url: "${env.GITHUB_REPO}"]]
+                    ])
+                }
             }
         }
+
         stage('Build Docker Image') {
             steps {
                 script {
-                    docker.build("${ECR_REPOSITORY}:${IMAGE_TAG}")
+                    echo 'Building Docker image...'
+                    def customImage = docker.build("${env.DOCKER_IMAGE}:latest")
                 }
             }
         }
+
         stage('Login to ECR') {
             steps {
                 script {
-                    // Login to ECR using AWS CLI
-                    def ecrLoginCommand = sh(script: "aws ecr get-login-password --region ${AWS_REGION}", returnStdout: true).trim()
-                    sh "echo ${ecrLoginCommand} | docker login --username AWS --password-stdin ${ECR_URI}"
+                    // Install AWS CLI if not already installed
+                    sh 'which aws || pip install awscli'
+                    
+                    // Get ECR login password and login to ECR
+                    def loginCommand = sh(script: "aws ecr get-login-password --region ${env.AWS_REGION}", returnStdout: true).trim()
+                    sh "echo ${loginCommand} | docker login --username AWS --password-stdin ${env.ECR_REPOSITORY}"
                 }
             }
         }
-        stage('Push Docker Image to ECR') {
+
+        stage('Push Docker Image') {
             steps {
                 script {
-                    def imageName = "${ECR_REPOSITORY}:${IMAGE_TAG}"
-                    docker.tag(imageName, "${ECR_URI}:${IMAGE_TAG}")
-                    docker.push("${ECR_URI}:${IMAGE_TAG}")
+                    echo 'Pushing Docker image to ECR...'
+                    def customImage = docker.image("${env.DOCKER_IMAGE}:latest")
+                    customImage.tag("${env.ECR_REPOSITORY}:latest")
+                    customImage.push('latest')
                 }
             }
         }
     }
+    
     post {
-        always {
-            cleanWs() // Clean workspace after build
+        success {
+            echo 'Pipeline succeeded.'
+        }
+        failure {
+            echo 'Pipeline failed.'
         }
     }
 }
+
 
