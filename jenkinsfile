@@ -3,15 +3,17 @@ pipeline {
 
     environment {
         DOCKER_IMAGE = 'yerubandiram/microserviceb'
-        ECR_REPOSITORY = '024848485298.dkr.ecr.us-west-2.amazonaws.com/yerubandiram'  // Update this to your ECR repository URL
-        AWS_REGION = 'us-west-2'  // Update this to your AWS region
+        ECR_REPOSITORY = '024848485298.dkr.ecr.us-west-2.amazonaws.com/yerubandiram'
+        AWS_REGION = 'us-west-2'
+        GITHUB_REPO = 'https://github.com/ramyerubandi1/microservicecal.git'
+        GIT_BRANCH = 'main'
     }
 
     stages {
         stage('Checkout') {
             steps {
                 script {
-                    echo "Checking out repository from env.https://github.com/ramyerubandi1/microservicecal.git branch env.main"
+                    echo "Checking out repository from ${env.GITHUB_REPO} branch ${env.GIT_BRANCH}"
                     checkout([$class: 'GitSCM',
                         branches: [[name: "*/${env.GIT_BRANCH}"]],
                         userRemoteConfigs: [[url: "${env.GITHUB_REPO}"]]
@@ -63,5 +65,4 @@ pipeline {
         }
     }
 }
-
 
