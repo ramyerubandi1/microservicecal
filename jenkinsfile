@@ -1,61 +1,51 @@
-
 pipeline {
-    agent any
-
-    environment {
-        // Replace with your ECR details
-        ECR_REPOSITORY = '024848485298.dkr.ecr.us-west-2.amazonaws.com/yerubandiram'
-        AWS_REGION = 'us-west-2'
-        IMAGE_TAG = "latest" // or use a dynamic tag like "${env.BUILD_ID}"
-        GIT_BRANCH = 'main' // specify your branch here
+    agent {
+        docker {
+            image 'docker:latest'
+            args '-v /var/run/docker.sock:/var/run/docker.sock'
+        }
     }
-
+    environment {
+        ECR_REPOSITORY = '024848485298.dkr.ecr.us-west-2.amazonaws.com/yerubandiram'
+        IMAGE_TAG = 'latest' // Use a more dynamic tag if needed
+        AWS_REGION = 'us-west-2'
+        ECR_URI = "024848485298.dkr.ecr.us-west-2.amazonaws.com/${yerubandiram}"
+    }
     stages {
         stage('Checkout Code') {
             steps {
-                // Checkout the specified branch from the repository
-                git branch: "${env.GIT_BRANCH}", url: 'https://github.com/ramyerubandi1/microservicecal.git'
+                git branch: 'main', url: 'https://github.com/ramyerubandi1/microservicecal.git'
             }
         }
-
         stage('Build Docker Image') {
             steps {
                 script {
-                    docker.build("my-image:${env.IMAGE_TAG}")
+                    docker.build("${ECR_REPOSITORY}:${IMAGE_TAG}")
                 }
             }
         }
-
         stage('Login to ECR') {
             steps {
                 script {
-                    // Configure AWS CLI
-                    withCredentials([usernamePassword(credentialsId: 'aws-credentials-id', passwordVariable: 'AWS_SECRET_ACCESS_KEY', usernameVariable: 'AWS_ACCESS_KEY_ID')]) {
-                        sh '''
-                        aws ecr get-login-password --region ${AWS_REGION} | docker login --username AWS --password-stdin ${ECR_REPOSITORY}
-                        '''
-                    }
+                    // Login to ECR using AWS CLI
+                    def ecrLoginCommand = sh(script: "aws ecr get-login-password --region ${AWS_REGION}", returnStdout: true).trim()
+                    sh "echo ${ecrLoginCommand} | docker login --username AWS --password-stdin ${ECR_URI}"
                 }
             }
         }
-
-        stage('Push Docker Image') {
+        stage('Push Docker Image to ECR') {
             steps {
                 script {
-                    docker.withRegistry("https://${ECR_REPOSITORY}", 'aws-credentials-id') {
-                        docker.image("my-image:${env.IMAGE_TAG}").push("${env.IMAGE_TAG}")
-                    }
+                    def imageName = "${ECR_REPOSITORY}:${IMAGE_TAG}"
+                    docker.tag(imageName, "${ECR_URI}:${IMAGE_TAG}")
+                    docker.push("${ECR_URI}:${IMAGE_TAG}")
                 }
             }
         }
     }
-
     post {
-        success {
-            echo 'Pipeline succeeded!'
-        }
-        failure {
-            echo 'Pipeline failed.'
+        always {
+            cleanWs() // Clean workspace after build
         }
     }
 }
