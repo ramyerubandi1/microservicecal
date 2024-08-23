@@ -3,7 +3,7 @@ pipeline {
 
     environment {
         DOCKER_IMAGE = 'microserviceb'
-        ECR_REPOSITORY = '024848485298.dkr.ecr.us-west-2.amazonaws.com'
+        ECR_REPOSITORY = '024848485298.dkr.ecr.us-west-2.amazonaws.com/microserviceb'
         AWS_REGION = 'us-west-2'
         GITHUB_REPO = 'https://github.com/ramyerubandi1/microservicecal.git'
         GIT_BRANCH = 'main'
