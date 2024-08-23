@@ -1,9 +1,10 @@
+
 pipeline {
     agent any
 
     environment {
         // Replace with your ECR details
-        ECR_REPOSITORY = 'yerubandiram'
+        ECR_REPOSITORY = '024848485298.dkr.ecr.us-west-2.amazonaws.com/yerubandiram'
         AWS_REGION = 'us-west-2'
         IMAGE_TAG = "latest" // or use a dynamic tag like "${env.BUILD_ID}"
         GIT_BRANCH = 'main' // specify your branch here
@@ -31,7 +32,7 @@ pipeline {
                     // Configure AWS CLI
                     withCredentials([usernamePassword(credentialsId: 'aws-credentials-id', passwordVariable: 'AWS_SECRET_ACCESS_KEY', usernameVariable: 'AWS_ACCESS_KEY_ID')]) {
                         sh '''
-                        $(aws ecr get-login-password --region ${AWS_REGION} | docker login --username AWS --password-stdin ${ECR_REPOSITORY})
+                        aws ecr get-login-password --region ${AWS_REGION} | docker login --username AWS --password-stdin ${ECR_REPOSITORY}
                         '''
                     }
                 }
@@ -41,7 +42,7 @@ pipeline {
         stage('Push Docker Image') {
             steps {
                 script {
-                    docker.withRegistry("https://${ECR_REPOSITORY}.dkr.ecr.${AWS_REGION}.amazonaws.com", 'aws-credentials-id') {
+                    docker.withRegistry("https://${ECR_REPOSITORY}", 'aws-credentials-id') {
                         docker.image("my-image:${env.IMAGE_TAG}").push("${env.IMAGE_TAG}")
                     }
                 }
