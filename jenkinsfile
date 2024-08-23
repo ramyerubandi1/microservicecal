@@ -6,10 +6,10 @@ pipeline {
         }
     }
     environment {
-        ECR_REPOSITORY = '024848485298.dkr.ecr.us-west-2.amazonaws.com/yerubandiram'
-        IMAGE_TAG = 'latest' // Use a more dynamic tag if needed
+        ECR_REPOSITORY = 'yerubandiram'
+        IMAGE_TAG = 'latest'
         AWS_REGION = 'us-west-2'
-        ECR_URI = "024848485298.dkr.ecr.us-west-2.amazonaws.com/${yerubandiram}"
+        ECR_URI = "024848485298.dkr.ecr.${us-west-2}.amazonaws.com/${yerubandiram}"
     }
     stages {
         stage('Checkout Code') {
@@ -49,3 +49,4 @@ pipeline {
         }
     }
 }
+
