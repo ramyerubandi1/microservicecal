@@ -2,8 +2,8 @@ pipeline {
     agent any
 
     environment {
-        DOCKER_IMAGE = 'yerubandiram/microserviceb'
-        ECR_REPOSITORY = '024848485298.dkr.ecr.us-west-2.amazonaws.com/yerubandiram'
+        DOCKER_IMAGE = 'microserviceb'
+        ECR_REPOSITORY = '024848485298.dkr.ecr.us-west-2.amazonaws.com'
         AWS_REGION = 'us-west-2'
         GITHUB_REPO = 'https://github.com/ramyerubandi1/microservicecal.git'
         GIT_BRANCH = 'main'
