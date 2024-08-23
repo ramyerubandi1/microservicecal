@@ -1,23 +1,12 @@
 pipeline {
     agent any
 
-    environment {
-        DOCKER_IMAGE = '024848485298.dkr.ecr.us-west-2.amazonaws.com/microserviceb'
-        ECR_REPOSITORY = '024848485298.dkr.ecr.us-west-2.amazonaws.com/microserviceb'
-        AWS_REGION = 'us-west-2'
-        GITHUB_REPO = 'https://github.com/ramyerubandi1/microservicecal.git'
-        GIT_BRANCH = 'main'
-    }
 
     stages {
         stage('Checkout') {
             steps {
                 script {
-                    echo "Checking out repository from ${env.GITHUB_REPO} branch ${env.GIT_BRANCH}"
-                    checkout([$class: 'GitSCM',
-                        branches: [[name: "*/${env.GIT_BRANCH}"]],
-                        userRemoteConfigs: [[url: "${env.GITHUB_REPO}"]]
-                    ])
+                   sh 'git clone <url>'
                 }
             }
         }
@@ -25,8 +14,9 @@ pipeline {
         stage('Build Docker Image') {
             steps {
                 script {
-                    echo 'Building Docker image...'
-                    def customImage = docker.build("${env.DOCKER_IMAGE}:latest")
+                   sh 'cd repo'
+                    sh 'docker build -t imagename . '
+                
                 }
             }
         }
@@ -34,12 +24,7 @@ pipeline {
         stage('Login to ECR') {
             steps {
                 script {
-                    // Install AWS CLI if not already installed
-                    sh 'which aws || pip install awscli'
-                    
-                    // Get ECR login password and login to ECR
-                    def loginCommand = sh(script: "aws ecr get-login-password --region ${env.AWS_REGION}", returnStdout: true).trim()
-                    sh "echo ${loginCommand} | docker login --username AWS --password-stdin ${env.ECR_REPOSITORY}"
+                sh 'aws er-login. ....' 
                 }
             }
         }
@@ -47,11 +32,8 @@ pipeline {
         stage('Push Docker Image') {
             steps {
                 script {
-                    echo 'Pushing Docker image to ECR...'
-                    def customImage = docker.image("${env.DOCKER_IMAGE}:latest")
-                    sh "docker images"
-                   // customImage.tag("${env.ECR_REPOSITORY}:latest")
-                    customImage.push('latest')
+                  sh 'docker tag imagename ecrrepo/imagename '
+                    sh 'docker push ecrrepo/imagename'
                 }
             }
         }
