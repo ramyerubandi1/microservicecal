@@ -1,33 +1,38 @@
+
 pipeline {
     agent any
 
     environment {
-        DOCKER_CREDENTIALS_ID = 'docker-hub-credentials' 
-        DOCKER_IMAGE = 'yerubandiram/microservicecl'
-        GITHUB_REPO = 'https://github.com/ramyerubandi1/microservicecal.git'
-        GIT_BRANCH = 'main' 
+        // Replace with your ECR details
+        ECR_REPOSITORY = 'yerubaniram'
+        AWS_REGION = 'us-west-2'
+        IMAGE_TAG = "latest" // or use a dynamic tag like "${env.BUILD_ID}"
     }
 
     stages {
-        stage('Checkout') {
+        stage('Checkout Code') {
             steps {
-                script {
-                    
-                    echo "Checking out repository from ${env.GITHUB_REPO} branch ${env.GIT_BRANCH}"
-                    
-                    
-                    checkout([$class: 'GitSCM',
-                        branches: [[name: "*/${env.GIT_BRANCH}"]],
-                        userRemoteConfigs: [[url: "${env.GITHUB_REPO}"]]
-                    ])
-                }
+                git 'https://github.com/ramyerubandi1/microservicecal.git'
             }
         }
 
         stage('Build Docker Image') {
             steps {
                 script {
-                    def customImage = docker.build("${env.DOCKER_IMAGE}:latest")
+                    docker.build("my-image:${env.IMAGE_TAG}")
+                }
+            }
+        }
+
+        stage('Login to ECR') {
+            steps {
+                script {
+                    // Configure AWS CLI
+                    withCredentials([usernamePassword(credentialsId: 'aws-credentials-id', passwordVariable: 'AWS_SECRET_ACCESS_KEY', usernameVariable: 'AWS_ACCESS_KEY_ID')]) {
+                        sh '''
+                        $(aws ecr get-login-password --region ${AWS_REGION} | docker login --username AWS --password-stdin ${ECR_REPOSITORY})
+                        '''
+                    }
                 }
             }
         }
@@ -35,18 +40,17 @@ pipeline {
         stage('Push Docker Image') {
             steps {
                 script {
-                    docker.withRegistry('https://index.docker.io/v1/', "${env.DOCKER_CREDENTIALS_ID}") {
-                        def customImage = docker.image("${env.DOCKER_IMAGE}:latest")
-                        customImage.push('latest')
+                    docker.withRegistry("https://${ECR_REPOSITORY}.dkr.ecr.${AWS_REGION}.amazonaws.com", 'aws-credentials-id') {
+                        docker.image("my-image:${env.IMAGE_TAG}").push("${env.IMAGE_TAG}")
                     }
                 }
             }
         }
     }
-    
+
     post {
         success {
-            echo 'Pipeline succeeded.'
+            echo 'Pipeline succeeded!'
         }
         failure {
             echo 'Pipeline failed.'
