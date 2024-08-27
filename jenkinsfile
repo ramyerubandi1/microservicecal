@@ -6,6 +6,7 @@ pipeline {
         stage('Checkout') {
             steps {
                 script {
+                sh 'rm -rf microservicecal'
                    sh 'git clone -b main https://github.com/ramyerubandi1/microservicecal.git'
                 }
             }
