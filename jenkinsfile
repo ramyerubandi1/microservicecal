@@ -14,8 +14,7 @@ pipeline {
         stage('Build Docker Image') {
             steps {
                 script {
-                   sh 'cd microservicecal'
-                    sh 'docker build -t micorservicea . '
+                   sh 'docker build -t microservicecal .'
                 
                 }
             }
@@ -32,7 +31,7 @@ pipeline {
         stage('Push Docker Image') {
             steps {
                 script {
-                  sh 'docker tag microsericea:latest 024848485298.dkr.ecr.us-west-2.amazonaws.com/microserviceb:latest'
+                  sh 'docker tag microsericecal:latest 024848485298.dkr.ecr.us-west-2.amazonaws.com/microserviceb:latest'
                     sh 'docker push 024848485298.dkr.ecr.us-west-2.amazonaws.com/microserviceb:lates'
                 }
             }
