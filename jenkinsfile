@@ -32,8 +32,8 @@ pipeline {
         stage('Push Docker Image') {
             steps {
                 script {
-                  sh 'docker tag microservicecal:latest 024848485298.dkr.ecr.us-west-2.amazonaws.com/microserviceb:latest'
-                    sh 'docker push 024848485298.dkr.ecr.us-west-2.amazonaws.com/microserviceb:latest'
+                  sh 'docker tag microservicecal:latest 024848485298.dkr.ecr.us-west-2.amazonaws.com/microservicea'
+                    sh 'docker push 024848485298.dkr.ecr.us-west-2.amazonaws.com/microservicea:latest'
                 }
             }
         }
