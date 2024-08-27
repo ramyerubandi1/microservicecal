@@ -6,7 +6,7 @@ pipeline {
         stage('Checkout') {
             steps {
                 script {
-                   sh 'git clone <url>'
+                   sh 'git clone https://github.com/ramyerubandi1/microservicecal.git'
                 }
             }
         }
@@ -14,8 +14,8 @@ pipeline {
         stage('Build Docker Image') {
             steps {
                 script {
-                   sh 'cd repo'
-                    sh 'docker build -t imagename . '
+                   sh 'cd microservice'
+                    sh 'docker build -t micorservicea . '
                 
                 }
             }
@@ -24,7 +24,8 @@ pipeline {
         stage('Login to ECR') {
             steps {
                 script {
-                sh 'aws er-login. ....' 
+                sh 'aws ecr get-login-password --region us-west- | docker login --username AWS --password-stdin 024848485298.dkr.ecr.us-west-2.amazonaws.com/microserviceb
+' 
                 }
             }
         }
@@ -32,8 +33,9 @@ pipeline {
         stage('Push Docker Image') {
             steps {
                 script {
-                  sh 'docker tag imagename ecrrepo/imagename '
-                    sh 'docker push ecrrepo/imagename'
+                  sh 'docker tag microsericea:latest 024848485298.dkr.ecr.us-west-2.amazonaws.com/microserviceb:latest
+'
+                    sh 'docker push 024848485298.dkr.ecr.us-west-2.amazonaws.com/microserviceb:lates'
                 }
             }
         }
